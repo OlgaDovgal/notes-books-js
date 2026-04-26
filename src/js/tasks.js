@@ -1,9 +1,13 @@
+import { nanoid } from 'nanoid';
 import {
   getTaskFromStore,
   initTaskStore,
   setTaskToStore,
+  removeTaskFromStore,
+  getThemStore
 } from './local-storage-api';
 import { renderAllTasksLS, renderTask } from './render-tasks';
+import refs from './refs';
 
 export function handleSubmitTask(event) {
   event.preventDefault();
@@ -13,6 +17,7 @@ export function handleSubmitTask(event) {
   const task = {
     name: taskName.value.trim(),
     description: taskDescription.value.trim(),
+    id: nanoid()
   };
   setTaskToStore(task);
   renderTask(task);
@@ -21,4 +26,17 @@ export function handleSubmitTask(event) {
 export function initPage() {
   initTaskStore();
   renderAllTasksLS(getTaskFromStore());
+  if (getThemStore() === "theme-dark") {
+    refs.body.classList.add("theme-dark");
+  } else {
+    refs.body.classList.remove("theme-dark");
+  }
+}
+
+export function handleDeleteTask(event) {
+  if (event.target.nodeName !== "BUTTON") return;
+  const liElement = event.target.parentElement;
+  const id = liElement.dataset.id;
+  liElement.remove();
+  removeTaskFromStore(id);
 }
